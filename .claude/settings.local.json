@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(cargo run:*)"
+      "Bash(cargo run:*)",
+      "Bash(cargo build:*)",
+      "Bash(cargo check:*)",
+      "Bash(mkdir:*)",
+      "Bash(curl:*)",
+      "Bash(if not exist \"C:\\bob\\assets\" mkdir \"C:\\bob\\assets\")",
+      "Bash(powershell -Command \"New-Item -ItemType Directory -Force -Path ''C:\\bob\\assets'' | Out-Null; Invoke-WebRequest -Uri ''https://github.com/twbs/icons/raw/main/font/fonts/bootstrap-icons.woff2'' -OutFile ''C:\\bob\\assets\\bootstrap-icons.woff2''\")"
     ],
     "deny": [],
     "ask": []
