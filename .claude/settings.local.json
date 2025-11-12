@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter pub get:*)",
+      "Bash(flutter analyze:*)",
+      "Bash(dart format:*)",
+      "Bash(cat:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebSearch",
+      "WebFetch(domain:pub.dev)",
+      "Bash(dart analyze:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

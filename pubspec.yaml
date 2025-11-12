@@ -1,0 +1,32 @@
+name: bob
+description: "Oncle Bob builds and launches web apps."
+publish_to: 'none'
+version: 0.0.1
+
+environment:
+  sdk: ^3.9.2
+  flutter: 3.38.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  file_picker: ^10.3.6
+  path_provider: ^2.1.5
+  path: ^1.9.1
+  shared_preferences: ^2.5.3
+  crypto: ^3.0.7
+  url_launcher: ^6.3.2
+  http: ^1.6.0
+  archive: ^4.0.7
+  provider: ^6.1.5+1
+  cbor: ^6.3.7
+  thirds: ^0.2.0-alpha.1
+  macos_secure_bookmarks: ^0.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
