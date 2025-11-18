@@ -4,6 +4,8 @@ import 'providers/project_provider.dart';
 import 'screens/home_screen.dart';
 import 'services/preferences_service.dart';
 
+const String appVersion = '0.0.2';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -21,7 +23,7 @@ class MainApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => ProjectProvider(),
       child: MaterialApp(
-        title: 'Oncle Bob',
+        title: 'Oncle Bob $appVersion',
         themeMode: ThemeMode.system,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
