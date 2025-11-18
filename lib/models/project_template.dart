@@ -19,6 +19,9 @@ class ProjectTemplate {
       case ProjectType.defaultType:
         return {
           'name': projectName,
+          'scripts': {
+            'start': 'bun x @xmit-co/bob preview',
+          },
         };
 
       case ProjectType.eleventy:

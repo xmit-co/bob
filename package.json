@@ -2,7 +2,9 @@
   "name": "bob",
   "version": "1.0.0",
   "description": "",
-  "scripts": {},
+  "scripts": {
+    "start": "bun x @xmit-co/bob preview"
+  },
   "bob": {
     "directory": "dist",
     "sites": {
