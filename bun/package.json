@@ -1,0 +1,60 @@
+{
+  "name": "@xmit.co/bob",
+  "version": "0.0.1",
+  "description": "The JS code for Oncle Bob",
+  "type": "module",
+  "bin": {
+    "bob": "./dist/cli.js"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE.md"
+  ],
+  "scripts": {
+    "build": "bun build src/cli.ts --outdir dist --target bun --format esm && bun build src/index.ts --outdir dist --target bun --format esm",
+    "dev": "bun run src/cli.ts",
+    "prepublishOnly": "bun run build"
+  },
+  "keywords": [
+    "xmit",
+    "preview",
+    "static-server",
+    "bun",
+    "http-server",
+    "dev-server",
+    "static-site",
+    "forms",
+    "redirects"
+  ],
+  "author": "xmit.co",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xmit-co/bob.git",
+    "directory": "bun"
+  },
+  "homepage": "https://github.com/xmit-co/bob/tree/main/bun#readme",
+  "bugs": {
+    "url": "https://github.com/xmit-co/bob/issues"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "dependencies": {
+    "@iarna/toml": "^2.2.5"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

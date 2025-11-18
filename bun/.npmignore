@@ -1,0 +1,18 @@
+# Source files
+src/
+tsconfig.json
+
+# Test files
+test-site/
+
+# Development files
+*.log
+.DS_Store
+node_modules/
+
+# Documentation that's not needed in the package
+EXAMPLE.md
+
+# Git files
+.git/
+.gitignore
