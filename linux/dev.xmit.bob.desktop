@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Oncle Bob
+Comment=Start, build, preview, launch static websites
+Exec=bob
+Icon=dev.xmit.bob
+Terminal=false
+Type=Application
+Categories=Development;Utility;
+StartupNotify=true
+StartupWMClass=bob

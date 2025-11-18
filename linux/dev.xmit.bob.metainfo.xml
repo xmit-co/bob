@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>dev.xmit.bob</id>
+  <metadata_license>0BSD</metadata_license>
+  <project_license>0BSD</project_license>
+  <name>Bob</name>
+  <summary>Oncle Bob builds and launches web apps</summary>
+  <description>
+    <p>
+      Bob is a utility application that helps you build and launch web applications.
+    </p>
+  </description>
+  <launchable type="desktop-id">dev.xmit.bob.desktop</launchable>
+  <provides>
+    <binary>bob</binary>
+  </provides>
+  <releases>
+    <release version="0.0.2" date="2024-11-18"/>
+  </releases>
+  <content_rating type="oars-1.1"/>
+</component>
