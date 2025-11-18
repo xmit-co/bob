@@ -39,9 +39,3 @@ jobs:
 
       - name: Build Windows app (${{ matrix.arch }})
         run: flutter build windows --release
-
-      - name: Upload Windows build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-build-${{ matrix.arch }}
-          path: ${{ matrix.build-path }}

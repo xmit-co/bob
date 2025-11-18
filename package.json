@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "bun x @xmit-co/bob preview"
+    "start": "bun x @xmit.co/bob preview"
   },
   "bob": {
     "directory": "dist",
