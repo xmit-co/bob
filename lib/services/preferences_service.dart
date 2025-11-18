@@ -238,8 +238,12 @@ class PreferencesService {
         final documentsDir = await getApplicationDocumentsDirectory();
         return documentsDir.path;
       } else if (Platform.isMacOS) {
-        // On macOS, never use a default directory to avoid sandboxed container directory
-        // Force user to select a location
+        // On macOS, use Documents directory (now that we're not sandboxed)
+        final homeDir = Platform.environment['HOME'];
+        if (homeDir != null) {
+          return path.join(homeDir, 'Documents');
+        }
+        // No valid home directory - force user to select
         return '';
       } else if (Platform.isLinux) {
         final homeDir = Platform.environment['HOME'];
