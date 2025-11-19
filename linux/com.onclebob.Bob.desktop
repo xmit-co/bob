@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Oncle Bob
+Comment=Bob application
+Exec=com.onclebob.Bob
+Icon=com.onclebob.Bob
+Type=Application
+Categories=Utility;
+Terminal=false
+StartupNotify=true
