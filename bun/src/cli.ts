@@ -50,11 +50,7 @@ async function main() {
       process.exit(1);
     }
 
-    const directory = pkg.bob?.directory;
-    if (!directory) {
-      console.error('Error: No "bob.directory" field found in package.json');
-      process.exit(1);
-    }
+    const directory = pkg.bob?.directory ?? ".";
 
     const projectRoot = resolve(packageJsonPath, "..");
     const absoluteDirectory = resolve(projectRoot, directory);

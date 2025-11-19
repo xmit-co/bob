@@ -1,6 +1,6 @@
 {
   "name": "@xmit.co/bob",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "The JS code for Oncle Bob",
   "type": "module",
   "bin": {
