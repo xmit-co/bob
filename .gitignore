@@ -1,3 +1,5 @@
+/.direnv/
+
 # Miscellaneous
 *.class
 *.log
