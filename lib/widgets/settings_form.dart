@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../config/constants.dart';
 import '../services/preferences_service.dart';
 import '../services/web_publication_service.dart';
+import '../services/key_request_service.dart';
 
 class _ApiKeyEntry {
   final String id;
@@ -40,11 +42,19 @@ class _SettingsFormState extends State<SettingsForm> {
   List<_ApiKeyEntry> _apiKeys = [];
   bool _isLoading = true;
   String? _error;
+  final KeyRequestService _keyRequestService = KeyRequestService();
+  final Map<String, bool> _requestingKeys = {};
 
   @override
   void initState() {
     super.initState();
     _loadSettings();
+  }
+
+  @override
+  void dispose() {
+    _keyRequestService.dispose();
+    super.dispose();
   }
 
   Future<void> _loadSettings() async {
@@ -117,6 +127,116 @@ class _SettingsFormState extends State<SettingsForm> {
       final entry = _apiKeys.removeAt(oldIndex);
       _apiKeys.insert(newIndex, entry);
     });
+  }
+
+  Future<void> _requestApiKey(String service, int index) async {
+    if (service.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Please enter a service domain first'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+      return;
+    }
+
+    setState(() {
+      _requestingKeys[service] = true;
+    });
+
+    try {
+      // Request and await key with browser opening
+      final apiKey = await _keyRequestService.requestAndAwaitKey(
+        serviceUrl: service,
+        applicationName: 'Oncle Bob',
+        onPollStart: (browserUrl) {
+          // Copy browser URL to clipboard
+          Clipboard.setData(ClipboardData(text: browserUrl));
+
+          // Show dialog with instructions
+          if (mounted) {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => AlertDialog(
+                title: const Text('Approve Key Request'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Opening your browser to approve the API key request...'),
+                    const SizedBox(height: 16),
+                    const Text('If the browser doesn\'t open automatically, visit:'),
+                    const SizedBox(height: 8),
+                    SelectableText(
+                      browserUrl,
+                      style: const TextStyle(
+                        fontFamily: 'monospace',
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text('(URL copied to clipboard)'),
+                    const SizedBox(height: 16),
+                    const Text('Waiting for approval...'),
+                    const SizedBox(height: 16),
+                    const Center(child: CircularProgressIndicator()),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          // Open browser
+          final uri = Uri.tryParse(browserUrl);
+          if (uri != null) {
+            launchUrl(uri, mode: LaunchMode.externalApplication);
+          }
+        },
+      );
+
+      // Close the waiting dialog
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+
+      // Update the API key field
+      setState(() {
+        _apiKeys[index].apiKey = apiKey;
+        _requestingKeys.remove(service);
+      });
+
+      // Show success message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('API key received successfully!'),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+          ),
+        );
+      }
+    } catch (e) {
+      // Close the waiting dialog if it's open
+      if (mounted && Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+
+      setState(() {
+        _requestingKeys.remove(service);
+      });
+
+      // Show error message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -379,6 +499,20 @@ class _SettingsFormState extends State<SettingsForm> {
                             const SizedBox(width: AppConstants.spacingS),
                             if (entry.service.isNotEmpty)
                               IconButton(
+                                icon: _requestingKeys[entry.service] == true
+                                    ? const SizedBox(
+                                        width: 16,
+                                        height: 16,
+                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                      )
+                                    : const Icon(Icons.vpn_key),
+                                onPressed: _requestingKeys[entry.service] == true
+                                    ? null
+                                    : () => _requestApiKey(entry.service, index),
+                                tooltip: 'Request API Key',
+                              ),
+                            if (entry.service.isNotEmpty)
+                              IconButton(
                                 icon: const Icon(Icons.open_in_browser),
                                 onPressed: () async {
                                   try {
@@ -400,7 +534,7 @@ class _SettingsFormState extends State<SettingsForm> {
                                     }
                                   }
                                 },
-                                tooltip: 'Get API Key',
+                                tooltip: 'Manage API Keys',
                               ),
                           ],
                         ),
