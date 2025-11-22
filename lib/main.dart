@@ -6,7 +6,7 @@ import 'providers/project_provider.dart';
 import 'screens/home_screen.dart';
 import 'services/preferences_service.dart';
 
-const String appVersion = '0.0.2';
+const String appVersion = '0.0.3';
 
 // Global reference for cleanup on app exit
 ProjectProvider? _projectProvider;
