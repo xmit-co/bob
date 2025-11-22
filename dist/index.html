@@ -1,62 +1,135 @@
 <!doctype html>
-<html
-    lang="en"
-    style="
-        color-scheme: dark light;
-        font-family: system-ui, sans-serif;
-        text-align: center;
-    "
->
+<html lang="en">
     <head>
         <meta charset="UTF-8" />
         <title>Oncle Bob</title>
         <style>
+            :root {
+                color-scheme: dark light;
+                font-family: system-ui, sans-serif;
+            }
+
             body {
                 max-width: 60em;
                 margin: 0 auto;
+                text-align: center;
             }
+
             img {
                 height: auto;
                 max-width: 90svw;
             }
-            section {
+
+            .app-icon {
+                border-radius: 1em;
+                filter: drop-shadow(0 0 1em #000);
+                max-width: 50svw;
+            }
+
+            .features {
                 text-align: left;
                 display: inline-block;
             }
-            section h3 {
+
+            .features h3 {
                 text-align: center;
+            }
+
+            .downloads {
+                font-size: 1.2em;
+                margin-top: 2em;
+            }
+
+            .source-code {
+                font-size: 0.9em;
+                opacity: 0.8;
+            }
+
+            figure {
+                margin: 1em 0;
             }
         </style>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
     </head>
+
     <body>
         <main>
-            <h1><img src="icon.avif" style="border-radius: 1em; box-shadow: 0 0 1em #000; max-width: 50svw" /><br />Oncle Bob</h1>
-            <h2>Got a static website? Need to launch it online?<br />Bob's your uncle.</h2>
-            <section>
+            <h1>
+                <img
+                    src="icon.avif"
+                    class="app-icon"
+                    alt="Oncle Bob Icon"
+                /><br />Oncle Bob
+            </h1>
+            <h2>
+                The simplest way to publish your static sites.<br />Bob's your
+                uncle.
+            </h2>
+            <section class="features">
                 <h3>Why Oncle Bob?</h3>
                 <ul>
-                    <li><strong>Deploy in seconds</strong> — Point to your folder and go live instantly</li>
-                    <li><strong>No configuration needed</strong> — Zero hassle, zero servers to manage</li>
-                    <li><strong>Works offline-first</strong> — Build and test locally before publishing</li>
-                    <li><strong>Flexible</strong> — Import your existing <code>package.json</code>-based project</li>
-                    <li><strong>Open source</strong> — Free to use, modify, and share</li>
+                    <li>
+                        <strong>Drag, drop, done</strong> — Point to your folder
+                        and go live instantly. No terminal required.
+                    </li>
+                    <li>
+                        <strong>Zero configuration</strong> — Forget YAML files
+                        and complex CI/CD pipelines. It just works.
+                    </li>
+                    <li>
+                        <strong>Local-first</strong> — Build, test, and preview
+                        your changes instantly, even without internet.
+                    </li>
+                    <li>
+                        <strong>Universal compatibility</strong> — Works with
+                        any static site generator (Hugo, Jekyll, 11ty) or plain
+                        HTML/JS.
+                    </li>
+                    <li>
+                        <strong>Open Source</strong> — Built by the community,
+                        for the community. Free to use and modify.
+                    </li>
                 </ul>
             </section>
             <p>
-                Still in early stages of development (v0.0.2).<br />
-                For now hosting is limited to <a href="https://xmit.co">xmit.co</a>, but please <a href="https://discord.xmit.dev">suggest more</a>.</p>
-            <p>
-                <a href="mac/Oncle%20Bob.zip">Mac</a> —
-                <a href="win/Oncle%20Bob%20setup.exe">Windows</a> —
-                <a href="linux/onclebob.flatpakref">Linux (Flatpak)</a> —
-                <a href="https://github.com/xmit-co/bob">Source code</a>
+                <strong>Currently in Early Access (v0.0.2).</strong><br />
+                Hosting is provided by <a href="https://xmit.co">xmit.co</a>.
+                Open to supporting alternatives!
+                <br />
+                Have a feature request?
+                <a href="https://discord.xmit.dev">Join our Discord</a>.
             </p>
-            <p><img src="preview.avif" width="908" height="620" /></p>
-            <p></p><img src="preview2.avif" width="908" height="620" /></p>
+            <section class="downloads">
+                <strong>Download for:</strong><br />
+                <a href="mac/Oncle%20Bob.zip">macOS</a> &bull;
+                <a href="win/Oncle%20Bob%20setup.exe">Windows</a> &bull;
+                <a href="linux/onclebob.flatpakref">Linux (Flatpak)</a>
+            </section>
+            <p class="source-code">
+                <a href="https://github.com/xmit-co/bob">View Source Code</a>
+            </p>
+            <figure>
+                <img
+                    src="preview.avif"
+                    width="908"
+                    height="620"
+                    alt="App preview showing deployment screen"
+                />
+            </figure>
+            <figure>
+                <img
+                    src="preview2.avif"
+                    width="908"
+                    height="620"
+                    alt="App preview showing settings"
+                />
+            </figure>
         </main>
         <footer>
-            <p><a href="privacy">privacy policy</a> — <a href="support">support</a></p>
+            <p>
+                <a href="privacy">privacy policy</a> —
+                <a href="support">support</a>
+            </p>
         </footer>
     </body>
 </html>
