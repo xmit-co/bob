@@ -146,12 +146,14 @@ class _SettingsFormState extends State<SettingsForm> {
       _requestingKeys[service] = true;
     });
 
+    bool cancelled = false;
+
     try {
       // Request and await key with browser opening
       final apiKey = await _keyRequestService.requestAndAwaitKey(
         serviceUrl: service,
         applicationName: 'Oncle Bob',
-        onPollStart: (browserUrl) {
+        onPollStart: (browserUrl, requestId) {
           // Copy browser URL to clipboard
           Clipboard.setData(ClipboardData(text: browserUrl));
 
@@ -159,30 +161,64 @@ class _SettingsFormState extends State<SettingsForm> {
           if (mounted) {
             showDialog(
               context: context,
-              barrierDismissible: false,
-              builder: (context) => AlertDialog(
-                title: const Text('Approve Key Request'),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Opening your browser to approve the API key request...'),
-                    const SizedBox(height: 16),
-                    const Text('If the browser doesn\'t open automatically, visit:'),
-                    const SizedBox(height: 8),
-                    SelectableText(
-                      browserUrl,
-                      style: const TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 12,
+              barrierDismissible: true,
+              builder: (context) => PopScope(
+                canPop: true,
+                onPopInvokedWithResult: (didPop, result) {
+                  if (didPop) {
+                    cancelled = true;
+                    _keyRequestService.cancelRequest();
+                  }
+                },
+                child: AlertDialog(
+                  title: const Text('Approve Key Request'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Opening your browser to approve the API key request...'),
+                      if (requestId.isNotEmpty) ...[
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            const Text('Request ID: '),
+                            SelectableText(
+                              requestId,
+                              style: const TextStyle(
+                                fontFamily: 'monospace',
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                      const SizedBox(height: 16),
+                      const Text('If the browser doesn\'t open automatically, visit:'),
+                      const SizedBox(height: 8),
+                      SelectableText(
+                        browserUrl,
+                        style: const TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 12,
+                        ),
                       ),
+                      const SizedBox(height: 8),
+                      const Text('(URL copied to clipboard)'),
+                      const SizedBox(height: 16),
+                      const Text('Waiting for approval...'),
+                      const SizedBox(height: 16),
+                      const Center(child: CircularProgressIndicator()),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        cancelled = true;
+                        _keyRequestService.cancelRequest();
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Cancel'),
                     ),
-                    const SizedBox(height: 8),
-                    const Text('(URL copied to clipboard)'),
-                    const SizedBox(height: 16),
-                    const Text('Waiting for approval...'),
-                    const SizedBox(height: 16),
-                    const Center(child: CircularProgressIndicator()),
                   ],
                 ),
               ),
@@ -197,8 +233,16 @@ class _SettingsFormState extends State<SettingsForm> {
         },
       );
 
+      // Check if user cancelled while waiting
+      if (cancelled) {
+        setState(() {
+          _requestingKeys.remove(service);
+        });
+        return;
+      }
+
       // Close the waiting dialog
-      if (mounted) {
+      if (mounted && Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
       }
 
@@ -227,8 +271,8 @@ class _SettingsFormState extends State<SettingsForm> {
         _requestingKeys.remove(service);
       });
 
-      // Show error message
-      if (mounted) {
+      // Show error message only if not cancelled
+      if (mounted && !cancelled) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.toString().replaceFirst('Exception: ', '')),

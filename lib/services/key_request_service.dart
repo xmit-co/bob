@@ -7,8 +7,10 @@ import 'package:cbor/cbor.dart';
 /// Implements the key request protocol defined in xmitd/xhttpd/cli.go
 class KeyRequestService {
   final http.Client _httpClient = http.Client();
+  http.Client? _pollClient;
   static const Duration _httpTimeout = Duration(seconds: 30);
   static const Duration _pollTimeout = Duration(seconds: 90);
+  bool _cancelled = false;
 
   /// Normalize service domain to full URL with https://
   String _normalizeServiceUrl(String service) {
@@ -75,6 +77,7 @@ class KeyRequestService {
       final browserUrl = (decoded[CborSmallInt(5)] as CborString?)?.toString() ?? '';
       final pollUrl = (decoded[CborSmallInt(6)] as CborString?)?.toString() ?? '';
       final secret = (decoded[CborSmallInt(7)] as CborString?)?.toString() ?? '';
+      final requestId = (decoded[CborSmallInt(8)] as CborString?)?.toString() ?? '';
 
       if (browserUrl.isEmpty || pollUrl.isEmpty || secret.isEmpty) {
         throw Exception('Invalid response: missing required fields');
@@ -85,6 +88,7 @@ class KeyRequestService {
         pollUrl: pollUrl,
         secret: secret,
         baseUrl: url,
+        requestId: requestId,
       );
     } catch (e) {
       throw Exception('Failed to request key: $e');
@@ -98,9 +102,12 @@ class KeyRequestService {
   }) async {
     final pollUrl = '${keyRequest.baseUrl}${keyRequest.pollUrl}?secret=${Uri.encodeComponent(keyRequest.secret)}';
 
+    // Use dedicated poll client so it can be cancelled
+    _pollClient = http.Client();
+
     try {
       // Make long-polling request (server will wait up to 90s)
-      final response = await _httpClient
+      final response = await _pollClient!
           .get(Uri.parse(pollUrl))
           .timeout(_pollTimeout);
 
@@ -117,40 +124,65 @@ class KeyRequestService {
         throw Exception('Failed to get key: ${response.statusCode}');
       }
     } catch (e) {
+      if (_cancelled) {
+        throw Exception('Request cancelled');
+      }
       if (e is TimeoutException) {
         throw Exception('Poll timeout - user may not have approved yet');
       }
       rethrow;
+    } finally {
+      _pollClient = null;
     }
+  }
+
+  /// Cancel any ongoing key request polling
+  void cancelRequest() {
+    _cancelled = true;
+    _pollClient?.close();
+    _pollClient = null;
   }
 
   /// Request and wait for API key with polling
   /// This is a convenience method that combines requestKey and awaitKey
-  /// The onPollStart callback is called with the browser URL before polling starts
+  /// The onPollStart callback is called with the browser URL and request ID before polling starts
   Future<String> requestAndAwaitKey({
     required String serviceUrl,
     String? applicationName,
-    required void Function(String browserUrl) onPollStart,
+    required void Function(String browserUrl, String requestId) onPollStart,
     Duration? pollInterval,
   }) async {
+    _cancelled = false;
+
     // Request key
     final keyRequest = await requestKey(
       serviceUrl: serviceUrl,
       applicationName: applicationName,
     );
 
+    if (_cancelled) {
+      throw Exception('Request cancelled');
+    }
+
     // Notify caller to open browser
-    onPollStart(keyRequest.browserUrl);
+    onPollStart(keyRequest.browserUrl, keyRequest.requestId);
 
     // Poll with retries (server uses long-polling, so we retry on timeout)
     final interval = pollInterval ?? const Duration(seconds: 2);
     final maxAttempts = 30; // 30 attempts * 90s each = up to 45 minutes total
 
     for (var attempt = 0; attempt < maxAttempts; attempt++) {
+      if (_cancelled) {
+        throw Exception('Request cancelled');
+      }
+
       try {
         final apiKey = await awaitKey(keyRequest: keyRequest);
         return apiKey;
       } catch (e) {
+        if (_cancelled) {
+          throw Exception('Request cancelled');
+        }
         // If timeout, retry after interval
         if (e.toString().contains('timeout') && attempt < maxAttempts - 1) {
           await Future.delayed(interval);
@@ -188,11 +220,13 @@ class KeyRequestResponse {
   final String pollUrl;
   final String secret;
   final String baseUrl;
+  final String requestId;
 
   KeyRequestResponse({
     required this.browserUrl,
     required this.pollUrl,
     required this.secret,
     required this.baseUrl,
+    required this.requestId,
   });
 }

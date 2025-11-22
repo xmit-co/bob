@@ -3,7 +3,7 @@
 ; Non-commercial use only
 
 #define MyAppName "Oncle Bob"
-#define MyAppVersion "0.0.2"
+#define MyAppVersion "0.0.3"
 #define MyAppPublisher "xmit.dev"
 #define MyAppURL "https://xmit.dev/"
 #define MyAppExeName "bob.exe"
