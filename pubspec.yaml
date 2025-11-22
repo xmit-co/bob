@@ -22,6 +22,7 @@ dependencies:
   cbor: ^6.3.7
   thirds: ^0.2.0-alpha.1
   macos_secure_bookmarks: ^0.2.1
+  window_manager: ^0.5.1
 
 dev_dependencies:
   flutter_test:

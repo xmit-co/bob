@@ -1183,6 +1183,17 @@ class LaunchService {
     );
   }
 
+  /// Dispose of resources when the service is no longer needed
+  void dispose() {
+    // Cancel all active launches
+    for (final launchId in _cancellationTokens.keys.toList()) {
+      _cancellationTokens[launchId] = true;
+    }
+
+    // Close the HTTP client to abort in-flight requests
+    _httpClient.close();
+  }
+
   /// List available teams for the authenticated user
   /// Returns a TeamListResponse with teams and management URL
   Future<TeamListResponse> listTeams(String serviceUrl, String authKey) async {

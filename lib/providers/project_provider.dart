@@ -954,6 +954,7 @@ class ProjectProvider with ChangeNotifier {
   @override
   void dispose() {
     _taskService.dispose();
+    _launchService.dispose();
     _taskOutputBuffers.clear();
 
     // Cancel all package.json watchers
