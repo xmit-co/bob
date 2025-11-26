@@ -1,7 +1,7 @@
 import { file, type Server } from "bun";
 import { parse as parseToml } from "@iarna/toml";
+import JSON5 from "json5";
 import { join, resolve } from "path";
-import { existsSync, statSync } from "fs";
 import type { XmitConfig } from "./config";
 import { v4 as uuidv4 } from "./uuid";
 
@@ -11,14 +11,10 @@ interface ServeOptions {
   hostname?: string;
 }
 
-function openFile(path: string): string | null {
-  try {
-    const stat = statSync(path);
-    if (!stat.isDirectory()) {
-      return path;
-    }
-  } catch {
-    // File doesn't exist or can't be accessed
+async function openFile(path: string): Promise<string | null> {
+  const f = file(path);
+  if (await f.exists() && f.size > 0) {
+    return path;
   }
   return null;
 }
@@ -106,19 +102,25 @@ export async function createServer(options: ServeOptions): Promise<Server> {
     port,
     hostname,
     async fetch(request: Request): Promise<Response> {
-      // Load xmit.toml configuration
+      // Load xmit.json (JSON5) or xmit.toml configuration
       let config: XmitConfig = {};
-      const cfgPath = join(absDirectory, "xmit.toml");
+      const jsonPath = join(absDirectory, "xmit.json");
+      const tomlPath = join(absDirectory, "xmit.toml");
 
-      try {
-        const cfgFile = file(cfgPath);
-        if (await cfgFile.exists()) {
-          const cfgText = await cfgFile.text();
-          config = parseToml(cfgText) as XmitConfig;
+      const jsonFile = file(jsonPath);
+      const tomlFile = file(tomlPath);
+
+      if (await jsonFile.exists()) {
+        try {
+          config = JSON5.parse(await jsonFile.text()) as XmitConfig;
+        } catch (err) {
+          console.warn(`⚠️ ${jsonPath}: ${err}`);
         }
-      } catch (err) {
-        if (existsSync(cfgPath)) {
-          console.warn(`⚠️ ${cfgPath}: ${err}`);
+      } else if (await tomlFile.exists()) {
+        try {
+          config = parseToml(await tomlFile.text()) as XmitConfig;
+        } catch (err) {
+          console.warn(`⚠️ ${tomlPath}: ${err}`);
         }
       }
 
@@ -197,18 +199,18 @@ export async function createServer(options: ServeOptions): Promise<Server> {
       const path = url.pathname.slice(1); // Remove leading /
       const originalPath = join(absDirectory, path);
       let realPath = originalPath;
-      let foundFile = openFile(realPath);
+      let foundFile = await openFile(realPath);
 
       // Try index.html in directory
       if (!foundFile) {
         realPath = join(originalPath, "index.html");
-        foundFile = openFile(realPath);
+        foundFile = await openFile(realPath);
       }
 
       // Try .html extension
       if (!foundFile) {
         realPath = originalPath + ".html";
-        foundFile = openFile(realPath);
+        foundFile = await openFile(realPath);
       }
 
       // Try redirects
@@ -230,7 +232,7 @@ export async function createServer(options: ServeOptions): Promise<Server> {
       // Try fallback
       if (!foundFile && config.fallback) {
         realPath = join(absDirectory, config.fallback);
-        foundFile = openFile(realPath);
+        foundFile = await openFile(realPath);
       }
 
       // Try 404 page
@@ -238,7 +240,7 @@ export async function createServer(options: ServeOptions): Promise<Server> {
         status = 404;
         if (config["404"]) {
           realPath = join(absDirectory, config["404"]);
-          foundFile = openFile(realPath);
+          foundFile = await openFile(realPath);
         }
       }
 

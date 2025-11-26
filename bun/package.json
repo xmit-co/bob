@@ -1,6 +1,6 @@
 {
   "name": "@xmit.co/bob",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "The JS code for Oncle Bob",
   "type": "module",
   "bin": {
@@ -46,7 +46,8 @@
     "bun": ">=1.0.0"
   },
   "dependencies": {
-    "@iarna/toml": "^2.2.5"
+    "@iarna/toml": "^2.2.5",
+    "json5": "^2.2.3"
   },
   "devDependencies": {
     "@types/bun": "latest"

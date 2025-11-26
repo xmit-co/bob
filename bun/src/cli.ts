@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 import { serve } from "./server";
-import { readFileSync, existsSync } from "fs";
+import { file } from "bun";
 import { resolve, join } from "path";
 import type { PackageJson } from "./config";
 
@@ -29,7 +29,7 @@ async function main() {
 
     while (currentDir !== "/") {
       const candidatePath = join(currentDir, "package.json");
-      if (existsSync(candidatePath)) {
+      if (await file(candidatePath).exists()) {
         packageJsonPath = candidatePath;
         break;
       }
@@ -43,7 +43,7 @@ async function main() {
 
     let pkg: PackageJson;
     try {
-      const pkgContent = readFileSync(packageJsonPath, "utf-8");
+      const pkgContent = await file(packageJsonPath).text();
       pkg = JSON.parse(pkgContent);
     } catch (err) {
       console.error(`Error reading package.json: ${err}`);
@@ -59,7 +59,7 @@ async function main() {
     const projectRoot = resolve(packageJsonPath, "..");
     const absoluteDirectory = resolve(projectRoot, directory);
 
-    if (!existsSync(absoluteDirectory)) {
+    if (!(await file(absoluteDirectory).exists())) {
       console.error(`Error: Directory "${directory}" does not exist (resolved to ${absoluteDirectory})`);
       process.exit(1);
     }
