@@ -2,7 +2,7 @@ PODS:
   - file_picker (0.0.1):
     - FlutterMacOS
   - FlutterMacOS (1.0.0)
-  - macos_secure_bookmarks (0.0.3):
+  - macos_secure_bookmarks (0.0.4):
     - FlutterMacOS
   - path_provider_foundation (0.0.1):
     - Flutter
