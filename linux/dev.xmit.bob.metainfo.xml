@@ -15,7 +15,7 @@
     <binary>bob</binary>
   </provides>
   <releases>
-    <release version="0.0.3" date="2024-11-18"/>
+    <release version="0.0.4" date="2024-11-18"/>
   </releases>
   <content_rating type="oars-1.1"/>
 </component>
